@@ -5,7 +5,7 @@ provider "google" {
   // ID of the project that will be used for managing resources
   project     = "<YOUR_PROJECT_ID>"
   // Default region for managing resources
-  region      = "us-central1"
+  region      = "europe-west2" // Updated to a region in France
 }
 
 // Declare a variable named "bucket_name"
@@ -15,7 +15,7 @@ variable "bucket_name" {
   // Type of the variable
   type        = string
   // Default value of the variable
-  default     = "<YOUR_BUCKET_NAME>"
+  default     = "multi-cloud-team" // Updated bucket name
 }
 
 // Declare a variable named "location"
@@ -25,7 +25,7 @@ variable "location" {
   // Type of the variable
   type        = string
   // Default value of the variable
-  default     = "US"
+  default     = "EU" // Updated to a location in Europe
 }
 
 // Declare a variable named "storage_class"

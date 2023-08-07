@@ -1,9 +1,9 @@
 // The provider block configures the named provider, in this case "google"
 provider "google" {
   // Path to the service account key file
-  credentials = file("<PATH_TO_YOUR_SERVICE_ACCOUNT_KEY>")
+#   credentials = file("<PATH_TO_YOUR_SERVICE_ACCOUNT_KEY>")
   // ID of the project that will be used for managing resources
-  project     = "<YOUR_PROJECT_ID>"
+  project     = "extended-altar-394912"
   // Default region for managing resources
   region      = "europe-west 2" // Updated to a region in France
 }
@@ -15,7 +15,7 @@ variable "bucket_name" {
   // Type of the variable
   type        = string
   // Default value of the variable
-  default     = "multi-cloud-team" // Updated bucket name
+  default     = "multi-cloud-team-std-bucket" // Updated bucket name
 }
 
 // Declare a variable named "location"

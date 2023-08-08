@@ -1,0 +1,196 @@
+                                                                             AZURE/TERRAFORM DOCUMENTATION
+                                                                                    (VM & STORAGE)
+
+<<VM>>
+
+
+1.Resource Group:
+
+resource "azurerm_resource_group" "rsc-grp" {
+  name     = "rsc-grp"
+  location = "East US"
+}
+
+
+#This section defines an Azure resource group named "rsc-grp" in the "East US" region.
+
+
+
+2.Virtual Network:
+
+resource "azurerm_virtual_network" "network" {
+  name                = "network"
+  address_space       = ["192.168.100.0/24"]
+  location            = "East US"
+  resource_group_name = azurerm_resource_group.rsc-grp.name
+}
+
+
+#This creates an Azure virtual network named "network" with the specified IP address range in the "East US" region, associated with the previously defined resource group.
+
+
+
+3.Subnet:
+
+resource "azurerm_subnet" "subnet" {
+  name                 = "subnet"
+  resource_group_name  = azurerm_resource_group.rsc-grp.name
+  virtual_network_name = azurerm_virtual_network.network.name
+  address_prefixes     = ["192.168.100.0/24"]
+}
+
+
+#This defines a subnet named "subnet" within the virtual network. It uses the same IP address range as the virtual network.
+
+
+
+4.Network Interface:
+
+resource "azurerm_network_interface" "interface" {
+  name                = "interface"
+  location            = "East US"
+  resource_group_name = azurerm_resource_group.rsc-grp.name
+
+  ip_configuration {
+    name                          = "internal"
+    subnet_id                     = azurerm_subnet.subnet.id
+    private_ip_address_allocation = "Dynamic"
+  }
+}
+
+
+#This section creates a network interface named "interface" in the "East US" region. It's associated with the previously defined subnet and configured for dynamic private IP address allocation.
+
+
+
+5.Linux Virtual machine:
+
+resource "azurerm_linux_virtual_machine" "virtual-machine" {
+  name                = "virtual-machine"
+  resource_group_name = azurerm_resource_group.rsc-grp.name
+  location            = "East US"
+  size                = "Standard_B1s"
+  admin_username      = "adminuser"
+  network_interface_ids = [
+    azurerm_network_interface.interface.id,
+  ]
+
+  admin_ssh_key {
+    username   = "adminuser"
+    public_key = file("~/.ssh/vm.pub")
+  }
+
+  os_disk {
+    caching              = "ReadWrite"
+    storage_account_type = "Standard_LRS"
+  }
+
+  source_image_reference {
+    publisher = "Canonical"
+    offer     = "UbuntuServer"
+    sku       = "18.04-LTS"
+    version   = "latest"
+  }
+}
+
+
+#This section creates an Azure Linux virtual machine named "virtual-machine" in the "East US" region. It uses the specified VM size, admin username, and connects to the previously created network interface. It also defines an SSH key for authentication, sets the OS disk properties, and specifies the source image for the virtual machine.
+
+Please note that this code assumes you have your SSH public key stored in the ~/.ssh/vm.pub file for authentication. Additionally, it deploys resources in the Azure East US region.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<<STORAGE>>
+ 
+
+
+1.Resource Group Creation:
+
+resource "azurerm_resource_group" "app-grp" {
+  name     = "app-grp"
+  location = "West Europe"
+}
+
+
+#This section defines an Azure Resource Group named "app-grp" in the "West Europe" region.
+
+
+
+2.Storage Account Creation:
+
+resource "azurerm_storage_account" "storage_account" {
+  name                     = "terraformstore1999"
+  resource_group_name      = azurerm_resource_group.app-grp.name
+  location                 = "West Europe"
+  account_tier             = "Standard"
+  account_replication_type = "LRS"
+  allow_nested_items_to_be_public = true
+}
+
+
+#This section creates an Azure Storage Account named "terraformstore1999" within the previously created resource group. It's set to "Standard" tier with locally redundant replication. The setting allow_nested_items_to_be_public is enabled, which allows nested items (like blobs) within the storage account to be made public.
+
+
+
+3.Storage Container Creation:
+
+resource "azurerm_storage_container" "data" {
+  name                  = "data"
+  storage_account_name  = azurerm_storage_account.storage_account.name
+  container_access_type = "private"
+}
+
+
+#This section creates an Azure Storage Container named "data" within the previously created storage account. The container's access type is set to "private", meaning its contents (blobs) won't be publicly accessible.
+
+
+4.Storage Blob Creation:
+
+resource "azurerm_storage_blob" "sample" {
+  name                   = "sample.txt"
+  storage_account_name   = azurerm_storage_account.storage_account.name
+  storage_container_name = azurerm_storage_container.data.name
+  type                   = "Block"
+  source                 = "sample.txt"
+}
+
+
+#This section creates a blob named "sample.txt" within the "data" container of the storage account. The blob type is set to "Block", and the source for the blob content is specified as "sample.txt" (it's expected to exist in the same directory as the Terraform configuration).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
